@@ -1,6 +1,9 @@
+'use client';
+
 import { Eye, EyeOff, Lock, LogIn, Shield, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../providers/AuthProvider/AuthContext';
 
 type FormValues = {
   username: string;
@@ -15,32 +18,29 @@ type SignInProps = {
 };
 
 const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState('');
+  const { userLogin, loading, error, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormValues>();
 
   const onSubmit = async (data: FormValues) => {
     try {
-      setServerError('');
-      setLoading(true);
+      clearError();
+      const result = await userLogin(data);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log('Login data:', data);
-
-      // Simulate successful login
-      onClose();
+      if (result.success) {
+        reset();
+        onClose();
+        // Redirect to dashboard after successful login
+        window.location.href = '/dashboard';
+      }
     } catch (error) {
-      setServerError(error instanceof Error ? error.message : 'Login failed');
-    } finally {
-      setLoading(false);
+      console.error('Login error:', error);
     }
   };
 
@@ -74,15 +74,15 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
 
         {/* Form Content */}
         <div className="p-6">
-          {/* Server Error */}
-          {serverError && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
-              <X size={16} />
-              {serverError}
-            </div>
-          )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Server Error */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
+                <X size={16} />
+                {error}
+              </div>
+            )}
 
-          <div className="space-y-6">
             {/* Username Field */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -122,7 +122,7 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
                   type={showPassword ? 'text' : 'password'}
                   {...register('password', {
                     required: 'Password is required',
-                    minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                    minLength: { value: 8, message: 'Password must be at least 8 characters' },
                   })}
                   className={`w-full p-3 pr-12 border-2 rounded-lg transition-all duration-200 focus:outline-none ${
                     errors.password
@@ -147,7 +147,7 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <input
@@ -164,18 +164,11 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
                   Remember me (7 days)
                 </label>
               </div>
-              <button
-                type="button"
-                className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline transition-colors duration-200"
-              >
-                Forgot password?
-              </button>
             </div>
 
             {/* Submit Button */}
             <button
-              type="button"
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
               disabled={loading}
               className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 ${
                 loading
@@ -196,19 +189,10 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
               )}
             </button>
 
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">New to our platform?</span>
-              </div>
-            </div>
-
             {/* Register Link */}
             <div className="text-center">
               <button
+                type="button"
                 onClick={() => {
                   onClose();
                   onSwitchToRegister();
@@ -218,7 +202,7 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
                 Create New Account
               </button>
             </div>
-          </div>
+          </form>
 
           {/* Security Notice */}
           <div className="mt-6 bg-gray-50 rounded-lg p-3">

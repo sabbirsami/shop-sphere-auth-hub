@@ -1,6 +1,10 @@
+'use client';
+
 import { Check, Eye, EyeOff, Lock, Plus, Store, Trash2, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useAuth } from '../../providers/AuthProvider/AuthContext';
+import toast from 'react-hot-toast';
 
 type FormValues = {
   username: string;
@@ -15,8 +19,7 @@ type RegisterProps = {
 };
 
 const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState('');
+  const { userRegister, loading, error, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [duplicateErrors, setDuplicateErrors] = useState<{ [key: number]: string }>({});
   const [passwordStrength, setPasswordStrength] = useState({
@@ -26,6 +29,7 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
     lowercase: false,
     specialChar: false,
   });
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const {
     register,
@@ -102,38 +106,54 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      setServerError('');
-      setLoading(true);
-
+      clearError();
       const shopNames = data.shops.map((s) => s.name.trim()).filter(Boolean);
 
       if (shopNames.length < 3) {
-        setServerError('At least 3 shop names are required');
         return;
       }
 
-      // Check for duplicates one more time before submission
       const lowerCaseNames = shopNames.map((name) => name.toLowerCase());
       if (new Set(lowerCaseNames).size !== lowerCaseNames.length) {
-        setServerError('All shop names must be unique');
         return;
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log('Registration data:', {
+      const result = await userRegister({
         username: data.username,
         password: data.password,
         shops: shopNames,
       });
 
-      reset();
-      onClose();
+      if (result.success) {
+        reset();
+        setRegistrationSuccess(true);
+        onClose();
+        toast('Successfully registered! Please log in.', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: '#4caf50',
+            color: '#fff',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            padding: '10px 20px',
+          },
+          className: 'font-semibold text-center',
+          icon: '🎉',
+          iconTheme: {
+            primary: '#fff',
+            secondary: '#4caf50',
+          },
+          ariaProps: {
+            role: 'status',
+            'aria-live': 'polite',
+          },
+          removeDelay: 1000,
+        });
+        // window.location.href = '/dashboard';
+      }
     } catch (error) {
-      setServerError(error instanceof Error ? error.message : 'Registration failed');
-    } finally {
-      setLoading(false);
+      console.error('Registration error:', error);
     }
   };
 
@@ -187,7 +207,21 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
 
         {/* Form Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(95vh-120px)]">
+          {registrationSuccess && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-green-700">
+              <Check size={16} />
+              Successfully registered! Please log in.
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Server Error */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
+                <X size={16} />
+                {error}
+              </div>
+            )}
+
             {/* Username Field */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -229,12 +263,6 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
                     required: 'Password is required',
                     minLength: { value: 8, message: 'Password must be at least 8 characters' },
                     validate: {
-                      hasUppercase: (value) =>
-                        /[A-Z]/.test(value) ||
-                        'Password must contain at least one uppercase letter',
-                      hasLowercase: (value) =>
-                        /[a-z]/.test(value) ||
-                        'Password must contain at least one lowercase letter',
                       hasNumber: (value) =>
                         /[0-9]/.test(value) || 'Password must contain at least one number',
                       hasSpecialChar: (value) =>
@@ -280,16 +308,6 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
                   <div className="grid grid-cols-1 gap-2 text-xs">
                     {[
                       { key: 'length', text: '8+ characters', check: passwordStrength.length },
-                      {
-                        key: 'uppercase',
-                        text: 'Uppercase letter',
-                        check: passwordStrength.uppercase,
-                      },
-                      {
-                        key: 'lowercase',
-                        text: 'Lowercase letter',
-                        check: passwordStrength.lowercase,
-                      },
                       { key: 'number', text: 'Number', check: passwordStrength.number },
                       {
                         key: 'specialChar',
@@ -331,7 +349,7 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
                 <button
                   type="button"
                   onClick={() => append({ name: '' })}
-                  disabled={fields.length >= 6}
+                  disabled={fields.length >= 4}
                   className="flex items-center gap-1 text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed text-sm font-medium transition-colors duration-200"
                 >
                   <Plus size={16} />
@@ -401,14 +419,6 @@ const Register = ({ isOpen, onClose, onSwitchToSignIn }: RegisterProps) => {
                 ))}
               </div>
             </div>
-
-            {/* Server Error */}
-            {serverError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
-                <X size={16} />
-                {serverError}
-              </div>
-            )}
 
             {/* Submit Button */}
             <button

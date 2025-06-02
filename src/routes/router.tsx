@@ -3,25 +3,42 @@ import Home from '../components/home/Home';
 import DashboardLayout from '../components/layouts/DashboardLayout';
 import MainLayout from '../components/layouts/MainLayout';
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <MainLayout />,
-    children: [
+import SubdomainDashboard from '../components/dashboard/SubdomainDashboard';
+import { isSubdomain } from '../utils/subdomain';
+
+// Create different routers based on whether we're on a subdomain
+const createRouterConfig = () => {
+  if (isSubdomain()) {
+    // Subdomain routing - only show subdomain dashboard
+    return [
       {
-        index: true,
-        element: <Home />,
+        path: '/',
+        element: <SubdomainDashboard />,
       },
-    ],
-  },
-  {
-    path: '/dashboard',
-    element: <DashboardLayout />,
-    children: [
       {
-        index: true,
-        element: <h1 className="text-3xl font-bold underline">Welcome to the Dashboard!</h1>,
+        path: '*',
+        element: <SubdomainDashboard />, // Redirect all routes to dashboard on subdomains
       },
-    ],
-  },
-]);
+    ];
+  }
+
+  // Main domain routing
+  return [
+    {
+      path: '/',
+      element: <MainLayout />,
+      children: [
+        {
+          index: true,
+          element: <Home />,
+        },
+      ],
+    },
+    {
+      path: '/dashboard',
+      element: <DashboardLayout />,
+    },
+  ];
+};
+
+export const router = createBrowserRouter(createRouterConfig());
