@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink, ShoppingBag, Store, TrendingUp, Users } from 'lucide-react';
-import { DEV_FRONTEND_URL, FRONTEND_URL, isDevelopment } from '../../config/constants';
+import { FRONTEND_URL, isDevelopment } from '../../config/constants';
 
 type Shop =
   | {
@@ -23,9 +23,9 @@ const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
 
   const handleShopClick = (shopName: string) => {
     onShopSelect(shopName);
-    // Redirect to subdomain with environment-aware URL
-    const baseUrl = isDevelopment ? DEV_FRONTEND_URL : FRONTEND_URL;
-    window.open(`https://${shopName}.${new URL(baseUrl).host}`, '_blank');
+    // Remove protocol from FRONTEND_URL
+    const domain = new URL(FRONTEND_URL).host;
+    window.open(`https://${shopName}.${domain}`, '_blank');
   };
 
   const getShopStats = () => {
