@@ -83,13 +83,16 @@ export const useSubdomainAuth = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/auth/shop/${shopName}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `https://shop-sphere-auth-hub-backend.vercel.app/api/auth/shop/${shopName}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
           },
-          credentials: 'include',
-        });
+        );
 
         if (!response.ok) {
           throw new Error('Shop verification failed');

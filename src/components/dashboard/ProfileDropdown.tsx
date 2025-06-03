@@ -2,6 +2,7 @@
 
 import { ChevronDown, LogOut, Store } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { DEV_FRONTEND_URL, FRONTEND_URL, isDevelopment } from '../../config/constants';
 import { useAuth } from '../../providers/AuthProvider/AuthContext';
 
 const ProfileDropdown = () => {
@@ -76,20 +77,24 @@ const ProfileDropdown = () => {
                 <span className="text-sm font-medium text-gray-700">Your Shops</span>
               </div>
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {user.shops.map((shop, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      const shopName =
-                        typeof shop === 'string' ? shop : shop.name || shop.displayName;
-                      window.open(`http://${shopName}.localhost:5173`, '_blank');
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 flex items-center justify-between group"
-                  >
-                    <span>{typeof shop === 'string' ? shop : shop.displayName || shop.name}</span>
-                    <span className="text-xs text-gray-400 group-hover:text-blue-500">Visit →</span>
-                  </button>
-                ))}
+                {user.shops.map((shop, index) => {
+                  const shopName = typeof shop === 'string' ? shop : shop.name || shop.displayName;
+                  const baseUrl = isDevelopment ? DEV_FRONTEND_URL : FRONTEND_URL;
+                  const shopUrl = `https://${shopName}.${new URL(baseUrl).host}`;
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => window.open(shopUrl, '_blank')}
+                      className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 flex items-center justify-between group"
+                    >
+                      <span>{typeof shop === 'string' ? shop : shop.displayName || shop.name}</span>
+                      <span className="text-xs text-gray-400 group-hover:text-blue-500">
+                        Visit →
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

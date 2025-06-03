@@ -1,6 +1,7 @@
 'use client';
 
 import { ExternalLink, ShoppingBag, Store, TrendingUp, Users } from 'lucide-react';
+import { DEV_FRONTEND_URL, FRONTEND_URL, isDevelopment } from '../../config/constants';
 
 type Shop =
   | {
@@ -14,7 +15,7 @@ type ShopGridProps = {
   selectedShop: string | null;
   onShopSelect: (shop: string) => void;
 };
-
+// http://shop-sphere-auth-hub-backend.vercel.app/
 const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
   const getShopName = (shop: Shop): string => {
     return typeof shop === 'string' ? shop : shop.displayName || shop.name || '';
@@ -22,8 +23,9 @@ const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
 
   const handleShopClick = (shopName: string) => {
     onShopSelect(shopName);
-    // Redirect to subdomain
-    window.open(`http://${shopName}.localhost:5173`, '_blank');
+    // Redirect to subdomain with environment-aware URL
+    const baseUrl = isDevelopment ? DEV_FRONTEND_URL : FRONTEND_URL;
+    window.open(`https://${shopName}.${new URL(baseUrl).host}`, '_blank');
   };
 
   const getShopStats = () => {
@@ -36,7 +38,7 @@ const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -130,7 +132,7 @@ const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
                       : 'bg-white text-gray-700 group-hover:bg-blue-600 group-hover:text-white'
                   }`}
                 >
-                  Visit {shopName}.localhost:5173
+                  Visit {shopName}.{isDevelopment ? 'localhost:5173' : new URL(FRONTEND_URL).host}
                 </div>
               </div>
 

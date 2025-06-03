@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useEffect, useState } from 'react';
+import { BACKEND_URL, DEV_FRONTEND_URL, FRONTEND_URL, isDevelopment } from '../../config/constants';
 import { useAuth } from '../../providers/AuthProvider/AuthContext';
-import { getMainDomain, getSubdomain } from '../../utils/subdomain';
+import { getSubdomain } from '../../utils/subdomain';
 import LoadingSpinner from '../shared/LoadingSpinner';
 
 const SubdomainDashboard = () => {
@@ -43,7 +43,7 @@ const SubdomainDashboard = () => {
 
         // Fetch shop-specific data using authenticated request
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`http://localhost:5000/api/shop/${subdomain}`, {
+        const response = await fetch(`${BACKEND_URL}/api/shop/${subdomain}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -81,7 +81,11 @@ const SubdomainDashboard = () => {
           <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => (window.location.href = `http://${getMainDomain()}/dashboard`)}
+            onClick={() =>
+              (window.location.href = isDevelopment
+                ? `${DEV_FRONTEND_URL}/dashboard`
+                : `${FRONTEND_URL}/dashboard`)
+            }
             className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Back to Dashboard
@@ -99,7 +103,11 @@ const SubdomainDashboard = () => {
             {shopData?.displayName || subdomain} Dashboard
           </h1>
           <button
-            onClick={() => (window.location.href = `http://${getMainDomain()}/dashboard`)}
+            onClick={() =>
+              (window.location.href = isDevelopment
+                ? `${DEV_FRONTEND_URL}/dashboard`
+                : `${FRONTEND_URL}/dashboard`)
+            }
             className="text-blue-600 hover:text-blue-800"
           >
             Back to Main Dashboard

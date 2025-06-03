@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { BACKEND_URL } from '../../config/constants';
 
 type User = {
   _id: string;
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Function to refresh access token
   const refreshAccessToken = async (): Promise<string | null> => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/refresh-token', {
+      const response = await fetch(`${BACKEND_URL}/api/auth/refresh-token`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUserProfile = async () => {
     try {
-      const response = await makeAuthenticatedRequest('http://localhost:5000/api/auth/profile');
+      const response = await makeAuthenticatedRequest(`${BACKEND_URL}/api/auth/profile`);
 
       if (response.ok) {
         const data = await response.json();
@@ -118,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await fetch('http://localhost:5000/api/auth/logout', {
+      await fetch(`${BACKEND_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -208,12 +209,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return false;
 
     try {
-      const response = await makeAuthenticatedRequest(
-        `http://localhost:5000/api/auth/shop/${shopName}`,
-        {
-          method: 'GET',
-        },
-      );
+      const response = await makeAuthenticatedRequest(`${BACKEND_URL}/api/auth/shop/${shopName}`, {
+        method: 'GET',
+      });
 
       if (response.ok) {
         return true;
@@ -245,7 +243,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const response = await makeAuthenticatedRequest('http://localhost:5000/api/auth/profile');
+        const response = await makeAuthenticatedRequest(`${BACKEND_URL}/api/auth/profile`);
 
         if (response.ok) {
           const data = await response.json();
@@ -331,7 +329,7 @@ export const useAuthenticatedRequest = () => {
     // If token expired, try to refresh
     if (response.status === 401 && token) {
       try {
-        const refreshResponse = await fetch('http://localhost:5000/api/auth/refresh-token', {
+        const refreshResponse = await fetch(`${BACKEND_URL}/api/auth/refresh-token`, {
           method: 'POST',
           credentials: 'include',
         });

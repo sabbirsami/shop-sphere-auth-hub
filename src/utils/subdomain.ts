@@ -5,7 +5,12 @@ export const getSubdomain = (): string | null => {
   const parts = hostname.split('.');
 
   // Check if we're on a subdomain (not main domain)
-  if (parts.length > 1 && parts[0] !== 'localhost' && parts[0] !== 'www') {
+  if (
+    parts.length > 1 &&
+    parts[0] !== 'localhost' &&
+    parts[0] !== 'www' &&
+    hostname !== 'shop-sphere-auth-hub.vercel.app'
+  ) {
     return parts[0];
   }
 
@@ -26,6 +31,12 @@ export const getMainDomain = (): string => {
     return `localhost${port ? `:${port}` : ''}`;
   }
 
-  // For production, return your main domain
-  return hostname.split('.').slice(-2).join('.');
+  // Return the main Vercel domain
+  if (hostname === 'shop-sphere-auth-hub.vercel.app') {
+    return hostname;
+  }
+
+  // For subdomains, return the main domain
+  const mainDomain = 'shop-sphere-auth-hub.vercel.app';
+  return mainDomain;
 };
