@@ -22,13 +22,13 @@ Ensure you have the following installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/sabbirsami/shop-sphere-auth-hub-frontend
+   git clone https://github.com/sabbirsami/shop-sphere-auth-hub
    ```
 
 2. **Navigate into the project directory:**
 
    ```bash
-   cd shop-sphere-auth-hub-frontend
+   cd shop-sphere-auth-hub
    ```
 
 3. **Install dependencies:**
