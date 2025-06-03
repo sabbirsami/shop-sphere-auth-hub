@@ -1,15 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
+import Dashboard from '../components/dashboard/Dashboard';
+import SubdomainDashboard from '../components/dashboard/SubdomainDashboard';
 import Home from '../components/home/Home';
 import DashboardLayout from '../components/layouts/DashboardLayout';
 import MainLayout from '../components/layouts/MainLayout';
-
-import SubdomainDashboard from '../components/dashboard/SubdomainDashboard';
 import { isSubdomain } from '../utils/subdomain';
 
-// Create different routers based on whether we're on a subdomain
 const createRouterConfig = () => {
   if (isSubdomain()) {
-    // Subdomain routing - only show subdomain dashboard
     return [
       {
         path: '/',
@@ -17,12 +15,11 @@ const createRouterConfig = () => {
       },
       {
         path: '*',
-        element: <SubdomainDashboard />, // Redirect all routes to dashboard on subdomains
+        element: <SubdomainDashboard />,
       },
     ];
   }
 
-  // Main domain routing
   return [
     {
       path: '/',
@@ -37,6 +34,20 @@ const createRouterConfig = () => {
     {
       path: '/dashboard',
       element: <DashboardLayout />,
+      children: [
+        {
+          index: true,
+          element: <Dashboard />,
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: (
+        <div className="min-h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold text-gray-900">404: Page not found</h1>
+        </div>
+      ),
     },
   ];
 };

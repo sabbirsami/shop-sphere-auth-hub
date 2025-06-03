@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider/AuthContext';
 import ProfileDropdown from '../dashboard/ProfileDropdown';
 import ShopGrid from '../dashboard/ShopGrid';
@@ -46,6 +47,7 @@ const DashboardLayout = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="lg:col-span-8">
           <ShopGrid shops={user.shops} selectedShop={selectedShop} onShopSelect={setSelectedShop} />
+          <Outlet /> {/* Add this to render nested routes */}
         </div>
       </main>
     </div>
