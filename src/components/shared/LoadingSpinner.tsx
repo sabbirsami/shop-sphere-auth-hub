@@ -1,13 +1,18 @@
 const LoadingSpinner = () => {
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="text-center">
-        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]">
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <div
+            className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-600 rounded-full animate-spin"
+            style={{ animationDirection: 'reverse', animationDuration: '1s' }}
+          ></div>
         </div>
-        <p className="mt-4 text-gray-600">Verifying shop access...</p>
+        <div className="mt-6 space-y-2">
+          <p className="text-lg font-semibold text-gray-900">Verifying shop access...</p>
+          <p className="text-sm text-gray-600">Please wait while we authenticate your request</p>
+        </div>
       </div>
     </div>
   );
