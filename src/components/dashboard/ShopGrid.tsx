@@ -21,11 +21,24 @@ const ShopGrid = ({ shops, selectedShop, onShopSelect }: ShopGridProps) => {
     return typeof shop === 'string' ? shop : shop.displayName || shop.name || '';
   };
 
+  // const handleShopClick = (shopName: string) => {
+  //   onShopSelect(shopName);
+  //   // Remove protocol from FRONTEND_URL
+  //   const domain = new URL(FRONTEND_URL).host;
+  //   window.open(`https://${shopName}.${domain}`, '_blank');
+  // };
+
   const handleShopClick = (shopName: string) => {
     onShopSelect(shopName);
-    // Remove protocol from FRONTEND_URL
-    const domain = new URL(FRONTEND_URL).host;
-    window.open(`https://${shopName}.${domain}`, '_blank');
+
+    // Fixed URL construction for subdomains
+    if (isDevelopment) {
+      // For development, use localhost with port
+      window.open(`http://${shopName}.localhost:5173`, '_blank');
+    } else {
+      // For production, use the correct Vercel subdomain format
+      window.open(`https://${shopName}.shop-sphere-auth-hub.vercel.app`, '_blank');
+    }
   };
 
   const getShopStats = () => {
