@@ -1,5 +1,4 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Dashboard from '../components/dashboard/Dashboard';
 import SubdomainDashboard from '../components/dashboard/SubdomainDashboard';
 import Home from '../components/home/Home';
 import DashboardLayout from '../components/layouts/DashboardLayout';
@@ -34,12 +33,6 @@ const createRouterConfig = () => {
     {
       path: '/dashboard',
       element: <DashboardLayout />,
-      children: [
-        {
-          index: true,
-          element: <Dashboard />,
-        },
-      ],
     },
     {
       path: '*',

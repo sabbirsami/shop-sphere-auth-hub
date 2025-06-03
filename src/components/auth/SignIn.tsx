@@ -3,6 +3,7 @@
 import { Eye, EyeOff, Lock, LogIn, Shield, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider/AuthContext';
 
 type FormValues = {
@@ -20,7 +21,7 @@ type SignInProps = {
 const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
   const { userLogin, loading, error, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -37,7 +38,7 @@ const SignIn = ({ isOpen, onClose, onSwitchToRegister }: SignInProps) => {
         reset();
         onClose();
         // Redirect to dashboard after successful login
-        window.location.href = '/dashboard';
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);

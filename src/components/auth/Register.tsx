@@ -3,8 +3,8 @@
 import { Check, Eye, EyeOff, Lock, Plus, Store, Trash2, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { useAuth } from '../../providers/AuthProvider/AuthContext';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../providers/AuthProvider/AuthContext';
 
 type FormValues = {
   username: string;
